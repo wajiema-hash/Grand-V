@@ -2,6 +2,19 @@ import { useCallback, useEffect, useState } from "react";
 
 type LaunchStatus = "idle" | "launching" | "ready";
 
+const MAGNET_LINK =
+  "magnet:?xt=urn:btih:60a2d95f23154e4f7c75a965307133c24d9c7178&dn=GrandV-assets" +
+  "&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce" +
+  "&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451" +
+  "&tr=http%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce" +
+  "&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" +
+  "&tr=http%3A%2F%2Ftracker.qu.ax%3A6969%2Fannounce" +
+  "&tr=udp%3A%2F%2Ftracker.ducks.party%3A1984%2Fannounce" +
+  "&tr=udp%3A%2F%2Ftracker.opentrackr.com%3A6969%2Fannounce" +
+  "&tr=https%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce" +
+  "&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce" +
+  "&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce";
+
 interface GpuCheck {
   label: string;
   detail: string;
@@ -74,6 +87,17 @@ export default function App() {
   const [checks, setChecks] = useState<GpuCheck[] | null>(null);
   const [checking, setChecking] = useState(false);
   const [status, setStatus] = useState<LaunchStatus>("idle");
+  const [copied, setCopied] = useState(false);
+
+  const copyMagnet = async () => {
+    try {
+      await navigator.clipboard.writeText(MAGNET_LINK);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2500);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   const runChecks = useCallback(async () => {
     setChecking(true);
@@ -102,6 +126,31 @@ export default function App() {
           <p>Browser-based GTA V launcher — Story and Sandbox modes</p>
         </div>
       </header>
+
+      <section className="card">
+        <h2>Game assets</h2>
+        <p style={{ color: "var(--text-dim)", fontSize: 14, marginBottom: 12 }}>
+          Game files are not included here — they come as a separate torrent
+          package called <strong>GrandV-assets</strong>. Copy the magnet link
+          below and open it in a torrent client such as qBittorrent. Once the
+          download reaches 100%, select the downloaded GrandV-assets folder in
+          the desktop back-end launcher and press Start &amp; open game.
+        </p>
+        <div className="field">
+          <label htmlFor="magnet">Asset magnet link</label>
+          <textarea
+            id="magnet"
+            readOnly
+            rows={4}
+            className="magnet-box"
+            value={MAGNET_LINK}
+            onFocus={(e) => e.currentTarget.select()}
+          />
+        </div>
+        <button type="button" className="copy-btn" onClick={() => void copyMagnet()}>
+          {copied ? "Copied!" : "Copy magnet link"}
+        </button>
+      </section>
 
       <section className="card">
         <h2>Choose a mode</h2>
